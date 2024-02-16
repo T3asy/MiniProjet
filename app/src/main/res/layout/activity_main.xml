@@ -8,14 +8,10 @@
 
     <ListView
         android:id="@+id/listView"
-        android:layout_width="414dp"
-        android:layout_height="578dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        android:layout_width="410dp"
+        android:layout_height="570dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-2dp" />
 
     <Button
         android:id="@+id/addNoteButton"
