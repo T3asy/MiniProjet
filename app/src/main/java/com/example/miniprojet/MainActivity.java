@@ -7,8 +7,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteActionListener {
@@ -31,22 +34,33 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
     }
 
     private void showAddNoteDialog() {
-        final EditText noteInput = new EditText(this);
-        noteInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        final EditText titleInput = new EditText(this);
+        titleInput.setHint("Titre");
+
+        final EditText descriptionInput = new EditText(this);
+        descriptionInput.setHint("Description");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(titleInput);
+        layout.addView(descriptionInput);
 
         new AlertDialog.Builder(this)
-                .setTitle("Nouvelle note")
-                .setView(noteInput)
+                .setTitle("Ajouter une nouvelle note")
+                .setView(layout)
                 .setPositiveButton("Ajouter", (dialog, which) -> {
-                    String noteText = noteInput.getText().toString();
-                    if (!noteText.isEmpty()) {
-                        notes.add(new Note(noteText));
+                    String title = titleInput.getText().toString();
+                    String description = descriptionInput.getText().toString();
+                    if (!title.isEmpty() && !description.isEmpty()) {
+                        Note note = new Note(title, description);
+                        notes.add(note);
                         noteAdapter.notifyDataSetChanged();
                     }
                 })
                 .setNegativeButton("Annuler", null)
                 .create().show();
     }
+
 
     @Override
     public void onNoteDelete(int position) {
@@ -60,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
         return true;
     }
 
-    public void supAll(MenuItem item){
+    public void supAll(MenuItem item) {
         final ListView listView = findViewById(R.id.listView);
         NoteAdapter listNotes = (NoteAdapter) listView.getAdapter();
         listNotes.clear();
@@ -68,22 +82,40 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
 
     @Override
     public void onNoteEdit(int position) {
-        Note note = notes.get(position);
-        final EditText noteInput = new EditText(this);
-        noteInput.setInputType(InputType.TYPE_CLASS_TEXT);
-        noteInput.setText(note.getText());
+        final Note note = notes.get(position);
 
+        // Créer un layout pour la boîte de dialogue
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        // Créer un champ de texte pour le titre
+        final EditText titleInput = new EditText(this);
+        titleInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        titleInput.setHint("Titre");
+        titleInput.setText(note.getTitle()); // Pré-remplir avec le titre actuel
+        layout.addView(titleInput);
+
+        // Créer un champ de texte pour la description
+        final EditText descriptionInput = new EditText(this);
+        descriptionInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        descriptionInput.setHint("Description");
+        descriptionInput.setText(note.getDescription()); // Pré-remplir avec la description actuelle
+        layout.addView(descriptionInput);
+
+        // Créer et afficher la boîte de dialogue
         new AlertDialog.Builder(this)
                 .setTitle("Modifier la note")
-                .setView(noteInput)
+                .setView(layout)
                 .setPositiveButton("Sauvegarder", (dialog, which) -> {
-                    String noteText = noteInput.getText().toString();
-                    if (!noteText.isEmpty()) {
-                        note.setText(noteText);
-                        noteAdapter.notifyDataSetChanged();
-                    }
+                    // Récupérer et mettre à jour les valeurs
+                    String newTitle = titleInput.getText().toString();
+                    String newDescription = descriptionInput.getText().toString();
+                    note.setTitle(newTitle);
+                    note.setDescription(newDescription);
+                    noteAdapter.notifyDataSetChanged(); // Notifier l'adaptateur du changement
                 })
                 .setNegativeButton("Annuler", null)
-                .create().show();
+                .show();
     }
+
 }

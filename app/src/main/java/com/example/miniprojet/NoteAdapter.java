@@ -1,5 +1,6 @@
 package com.example.miniprojet;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,13 +34,25 @@ public class NoteAdapter extends ArrayAdapter<Note> {
         }
 
         TextView noteText = convertView.findViewById(R.id.noteText);
+        TextView titleText = convertView.findViewById(R.id.noteTitleText);
         Button editButton = convertView.findViewById(R.id.editButton);
         Button deleteButton = convertView.findViewById(R.id.deleteButton);
 
-        noteText.setText(note.getText());
+        noteText.setText(note.getDescription());
+        titleText.setText(note.getTitle());
 
         editButton.setOnClickListener(v -> actionListener.onNoteEdit(position));
         deleteButton.setOnClickListener(v -> actionListener.onNoteDelete(position));
+
+
+        convertView.setOnClickListener(v -> {
+            Note note2 = getItem(position);
+            new AlertDialog.Builder(getContext())
+                    .setTitle(note2.getTitle())
+                    .setMessage(note2.getDescription())
+                    .setPositiveButton("OK", null)
+                    .show();}
+        );
 
 
         return convertView;

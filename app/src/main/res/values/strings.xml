@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MiniProjet</string>
     <string name="supp_all">Supprimer toutes les notes</string>
+    <string name="add_note">Ajouter une note</string>
 </resources>
