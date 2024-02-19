@@ -3,6 +3,8 @@ package com.example.miniprojet;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -50,6 +52,18 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
     public void onNoteDelete(int position) {
         notes.remove(position);
         noteAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    public void supAll(MenuItem item){
+        final ListView listView = findViewById(R.id.listView);
+        NoteAdapter listNotes = (NoteAdapter) listView.getAdapter();
+        listNotes.clear();
     }
 
     @Override
