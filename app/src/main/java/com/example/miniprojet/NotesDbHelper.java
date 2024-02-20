@@ -50,8 +50,6 @@ public class NotesDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Cette base de données est seulement un cache pour les données en ligne, donc sa politique de mise à jour
-        // est simplement de supprimer les données et de recommencer
         db.execSQL(SQL_DELETE_ENTRIES);
         onCreate(db);
     }

@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                     String title = titleInput.getText().toString();
                     String description = descriptionInput.getText().toString();
                     if (!title.isEmpty() && !description.isEmpty()) {
-                        Note note = new Note(title, description);
+                        long noteId = addNoteBDD(title,description);
+                        Note note = new Note(noteId,title, description);
                         notes.add(note);
-                        addNoteBDD(title,description);
                         noteAdapter.notifyDataSetChanged();
                     }
                 })
@@ -101,13 +101,14 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
         listNotes.clear();
         List<Note> list = getAllNotes();
         for (int i=0;i<list.size();i++){
-            deleteNote(i);
+            deleteNote(list.get(i).getId());
         }
     }
 
     @Override
     public void onNoteEdit(int position) {
         final Note note = notes.get(position);
+        long noteId = note.getId();
 
         // Créer un layout pour la boîte de dialogue
         LinearLayout layout = new LinearLayout(this);
@@ -132,20 +133,18 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                 .setTitle("Modifier la note")
                 .setView(layout)
                 .setPositiveButton("Sauvegarder", (dialog, which) -> {
-                    // Récupérer et mettre à jour les valeurs
                     String newTitle = titleInput.getText().toString();
                     String newDescription = descriptionInput.getText().toString();
                     note.setTitle(newTitle);
                     note.setDescription(newDescription);
-                    updateNote(position,newTitle,newDescription);
+                    updateNote(noteId,newTitle,newDescription);
                     noteAdapter.notifyDataSetChanged();
                 })
                 .setNegativeButton("Annuler", null)
                 .show();
     }
 
-    public void addNoteBDD(String title, String description) {
-        // Obtenir la base de données en écriture
+    public long addNoteBDD(String title, String description) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -153,7 +152,10 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
         values.put(COLUMN_DESCRIPTION, description);
 
         long newRowId = db.insert(dbHelper.getTableName(), null, values);
+
+        return newRowId;
     }
+
 
     public void updateNote(long noteId, String newTitle, String newDescription) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -208,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
             long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
             String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
             String itemDescription = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION));
-            notes.add(new Note(itemTitle, itemDescription));
+            notes.add(new Note(itemId,itemTitle, itemDescription));
         }
         cursor.close();
 

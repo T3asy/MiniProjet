@@ -19,6 +19,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
         this.actionListener = actionListener;
     }
 
+
     public interface NoteActionListener {
         void onNoteDelete(int position);
         void onNoteEdit(int position);

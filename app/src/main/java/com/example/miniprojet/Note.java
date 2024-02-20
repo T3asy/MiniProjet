@@ -1,12 +1,24 @@
 package com.example.miniprojet;
 
 public class Note {
-    private String title; // Titre de la note
-    private String description; // Description de la note
+    private long id; // Assurez-vous que cela correspond au schéma de votre base de données
+    private String title;
+    private String description;
 
-    public Note(String title, String description) {
+    // Constructeur avec ID
+    public Note(long id, String title, String description) {
+        this.id = id;
         this.title = title;
         this.description = description;
+    }
+
+    // Getters et Setters
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -24,7 +36,7 @@ public class Note {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }
+
 
 
