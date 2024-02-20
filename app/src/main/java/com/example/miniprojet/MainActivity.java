@@ -84,9 +84,11 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
 
     @Override
     public void onNoteDelete(int position) {
+        final Note note = notes.get(position);
+        long noteId = note.getId();
         notes.remove(position);
         noteAdapter.notifyDataSetChanged();
-        deleteNote(position);
+        deleteNote(noteId);
     }
 
     @Override
