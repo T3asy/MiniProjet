@@ -23,6 +23,7 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
     NotesDbHelper dbHelper = new NotesDbHelper(this);
 
     private ArrayList<Note> notes;
+    private final String FILENAME="testfile_note.txt";
+    NoteDb dbHelper = new NoteDb(this);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                 })
                 .setNegativeButton("Annuler", null)
                 .create().show();
+
+        dbHelper.addNote(titleInput.getText().toString(),descriptionInput.getText().toString());
     }
 
 
