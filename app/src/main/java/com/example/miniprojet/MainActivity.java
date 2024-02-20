@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
 
     private ArrayList<Note> notes;
     private final String FILENAME="testfile_note.txt";
-    NoteDb dbHelper = new NoteDb(this);
 
 
     @Override
@@ -80,8 +79,6 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                 })
                 .setNegativeButton("Annuler", null)
                 .create().show();
-
-        dbHelper.addNote(titleInput.getText().toString(),descriptionInput.getText().toString());
     }
 
 
