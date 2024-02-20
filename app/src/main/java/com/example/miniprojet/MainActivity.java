@@ -1,7 +1,6 @@
 package com.example.miniprojet;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
@@ -20,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
     private NoteAdapter noteAdapter;
     private ArrayList<Note> notes;
     private final String FILENAME="testfile_note.txt";
+    NoteDb dbHelper = new NoteDb(this);
 
 
     @Override
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                 })
                 .setNegativeButton("Annuler", null)
                 .create().show();
+
+        dbHelper.addNote(titleInput.getText().toString(),descriptionInput.getText().toString());
     }
 
 
@@ -120,18 +122,6 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                 })
                 .setNegativeButton("Annuler", null)
                 .show();
-    }
-
-    public void writeFile(){
-        try {
-            FileOutputStream fileOutputStream = openFileOutput(FILENAME,
-                    Context.MODE_PRIVATE);
-            ((FileOutputStream) fileOutputStream).write(notes.get(-1));
-            fileOutputStream.close();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
 }
