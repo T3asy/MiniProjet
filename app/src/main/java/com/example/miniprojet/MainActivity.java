@@ -1,6 +1,17 @@
 package com.example.miniprojet;
 
+
+
+
+
+import static android.app.DownloadManager.COLUMN_DESCRIPTION;
+import static android.app.DownloadManager.COLUMN_ID;
+import static android.app.DownloadManager.COLUMN_TITLE;
+
 import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
@@ -13,9 +24,12 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteActionListener {
     private NoteAdapter noteAdapter;
+    NotesDbHelper dbHelper = new NotesDbHelper(this);
+
     private ArrayList<Note> notes;
 
     @Override
@@ -30,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
         noteAdapter = new NoteAdapter(this, notes, this);
         notesListView.setAdapter(noteAdapter);
 
+        List<Note> list = getAllNotes();
+        notes.addAll(list);
         addNoteButton.setOnClickListener(v -> showAddNoteDialog());
     }
 
@@ -54,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                     if (!title.isEmpty() && !description.isEmpty()) {
                         Note note = new Note(title, description);
                         notes.add(note);
+                        addNoteBDD(title,description);
                         noteAdapter.notifyDataSetChanged();
                     }
                 })
@@ -66,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
     public void onNoteDelete(int position) {
         notes.remove(position);
         noteAdapter.notifyDataSetChanged();
+        deleteNote(position);
     }
 
     @Override
@@ -78,6 +96,10 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
         final ListView listView = findViewById(R.id.listView);
         NoteAdapter listNotes = (NoteAdapter) listView.getAdapter();
         listNotes.clear();
+        List<Note> list = getAllNotes();
+        for (int i=0;i<list.size();i++){
+            deleteNote(i);
+        }
     }
 
     @Override
@@ -112,10 +134,83 @@ public class MainActivity extends AppCompatActivity implements NoteAdapter.NoteA
                     String newDescription = descriptionInput.getText().toString();
                     note.setTitle(newTitle);
                     note.setDescription(newDescription);
-                    noteAdapter.notifyDataSetChanged(); // Notifier l'adaptateur du changement
+                    updateNote(position,newTitle,newDescription);
+                    noteAdapter.notifyDataSetChanged();
                 })
                 .setNegativeButton("Annuler", null)
                 .show();
     }
+
+    public void addNoteBDD(String title, String description) {
+        // Obtenir la base de données en écriture
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TITLE, title);
+        values.put(COLUMN_DESCRIPTION, description);
+
+        long newRowId = db.insert(dbHelper.getTableName(), null, values);
+    }
+
+    public void updateNote(long noteId, String newTitle, String newDescription) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TITLE, newTitle);
+        values.put(COLUMN_DESCRIPTION, newDescription);
+
+        String selection = COLUMN_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(noteId) };
+
+        int count = db.update(
+                dbHelper.getTableName(),
+                values,
+                selection,
+                selectionArgs);
+    }
+
+    public void deleteNote(long noteId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Définir la clause "where" pour spécifier quelle note supprimer.
+        String selection = COLUMN_ID + " = ?";
+        // Spécifier les arguments dans un tableau pour la clause "where".
+        String[] selectionArgs = { String.valueOf(noteId) };
+        // Exécuter la commande SQL de suppression.
+        db.delete( dbHelper.getTableName(), selection, selectionArgs);
+    }
+
+
+
+    public List<Note> getAllNotes() {
+        List<Note> notes = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] projection = {
+                COLUMN_ID,
+                COLUMN_TITLE,
+                COLUMN_DESCRIPTION
+        };
+
+        Cursor cursor = db.query(
+                dbHelper.getTableName(),   // La table à interroger
+                projection,            // Les colonnes à retourner
+                null,             // Les colonnes pour la clause WHERE
+                null,          // Les valeurs pour la clause WHERE
+                null,          // Ne pas grouper les lignes
+                null,           // Ne pas filtrer par groupe de lignes
+                null);          // L'ordre de tri
+
+        while (cursor.moveToNext()) {
+            long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
+            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
+            String itemDescription = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION));
+            notes.add(new Note(itemTitle, itemDescription));
+        }
+        cursor.close();
+
+        return notes;
+    }
+
 
 }
